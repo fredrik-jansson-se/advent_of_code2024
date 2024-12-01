@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use anyhow::anyhow;
 use nom::{character::complete::newline, sequence::separated_pair};
 
@@ -27,8 +29,18 @@ fn run_1(input: &str) -> anyhow::Result<i64> {
         .sum())
 }
 
-fn run_2(_input: &str) -> anyhow::Result<usize> {
-    todo!()
+fn run_2(input: &str) -> anyhow::Result<i64> {
+    let (_i, res) = parse(input).map_err(|e| anyhow!("{e}"))?;
+
+    let left: Vec<_> = res.iter().map(|(a, _b)| a).collect();
+    let mut cnt: HashMap<i64, i64> = HashMap::new();
+
+    res.iter().for_each(|(_a, b)| {
+        let c = cnt.entry(*b).or_default();
+        *c += 1;
+    });
+
+    Ok(left.iter().map(|a| **a * *cnt.get(a).unwrap_or(&0)).sum())
 }
 
 fn parse(i: crate::Input) -> PResult<Vec<(i64, i64)>> {
@@ -56,5 +68,7 @@ mod tests {
     }
 
     #[test]
-    fn day1_run_2() {}
+    fn day1_run_2() {
+        assert_eq!(super::run_2(INPUT).unwrap(), 31);
+    }
 }
