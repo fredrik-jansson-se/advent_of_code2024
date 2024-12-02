@@ -49,8 +49,6 @@ fn run_1(input: &str) -> anyhow::Result<usize> {
     Ok(safe)
 }
 
-// 553 - too low
-// 560 - too low
 fn run_2(input: &str) -> anyhow::Result<usize> {
     let (i, reports) = parse(input).map_err(|e| anyhow!("{e}"))?;
     assert!(i.len() <= 1);
