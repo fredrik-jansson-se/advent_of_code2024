@@ -58,8 +58,7 @@ fn run_2(input: &str) -> anyhow::Result<usize> {
     'reports: for report in reports {
         let diffs: Vec<i64> = report.windows(2).map(|v| v[0] - v[1]).collect();
 
-        if diffs.iter().all(|v| (-3..0).contains(v)) ||
-           diffs.iter().all(|v| (1..4).contains(v)) {
+        if diffs.iter().all(|v| (-3..0).contains(v)) || diffs.iter().all(|v| (1..4).contains(v)) {
             safe += 1;
             continue;
         }
@@ -67,10 +66,10 @@ fn run_2(input: &str) -> anyhow::Result<usize> {
             let mut report = report.clone();
             report.remove(i);
             let diffs: Vec<i64> = report.windows(2).map(|v| v[0] - v[1]).collect();
-            if diffs.iter().all(|v| (-3..0).contains(v)) ||
-                diffs.iter().all(|v| (1..4).contains(v)) {
-                    safe += 1;
-                    continue 'reports;
+            if diffs.iter().all(|v| (-3..0).contains(v)) || diffs.iter().all(|v| (1..4).contains(v))
+            {
+                safe += 1;
+                continue 'reports;
             }
         }
     }
