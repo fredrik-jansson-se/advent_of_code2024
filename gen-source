@@ -25,10 +25,12 @@ fn run_2(_input: &str) -> anyhow::Result<usize> {
 mod tests {
     #[test]
     fn day${day}_run_1() {
+    //
     }
 
     #[test]
     fn day${day}_run_2() {
+    //
     }
 }
 EOF

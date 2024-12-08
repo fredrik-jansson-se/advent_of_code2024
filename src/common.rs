@@ -17,12 +17,20 @@ impl std::ops::Sub<Coord> for Coord {
     }
 }
 
+impl std::ops::Mul<Coord> for usize {
+    type Output = Coord;
+
+    fn mul(self, rhs: Coord) -> Self::Output {
+        let i = self as isize;
+        Coord(rhs.0 * i, rhs.1 * i)
+    }
+}
+
 impl std::fmt::Display for Coord {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "({}, {})", self.0, self.1)
     }
 }
-
 
 impl Coord {
     //pub fn new(row: isize, col: isize) -> Self {
