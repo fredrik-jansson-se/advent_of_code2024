@@ -36,35 +36,34 @@ impl Coord {
     //pub fn new(row: isize, col: isize) -> Self {
     //    (row, col).into()
     //}
-    //pub fn row(&self) -> usize {
-    //    self.0 as _
-    //}
-    //
+    pub fn row(&self) -> usize {
+        self.0 as _
+    }
+
     pub fn irow(&self) -> isize {
         self.0
     }
     //
-    //pub fn col(&self) -> usize {
-    //    self.1 as _
-    //}
-    //
+    pub fn col(&self) -> usize {
+        self.1 as _
+    }
+
     pub fn icol(&self) -> isize {
         self.1
     }
-    //
-    //pub fn neighbors(&self) -> impl Iterator<Item = Self> {
-    //    [
-    //        (self.irow() - 1, self.icol()).into(),
-    //        (self.irow() + 1, self.icol()).into(),
-    //        (self.irow(), self.icol() - 1).into(),
-    //        (self.irow(), self.icol() + 1).into(),
-    //    ]
-    //    .into_iter()
-    //}
-    //
-    //pub fn manhattan(&self, other: &Self) -> usize {
-    //    ((self.irow() - other.irow()).abs() + (self.icol() - other.icol()).abs()) as usize
-    //}
+    pub fn neighbors(&self) -> impl Iterator<Item = Self> {
+        [
+            (self.irow() - 1, self.icol()).into(),
+            (self.irow() + 1, self.icol()).into(),
+            (self.irow(), self.icol() - 1).into(),
+            (self.irow(), self.icol() + 1).into(),
+        ]
+        .into_iter()
+    }
+
+    pub fn manhattan(&self, other: &Self) -> usize {
+        ((self.irow() - other.irow()).abs() + (self.icol() - other.icol()).abs()) as usize
+    }
 }
 
 impl From<(usize, usize)> for Coord {
