@@ -39,49 +39,46 @@ fn compact(mut disk: Disk) -> Disk {
     disk
 }
 
-fn compact_2(mut disk: Disk) -> Disk {
+fn find_free_space(disk: &[Option<usize>], needed: usize) -> Option<usize> {
     let mut idx = 0;
-    let mut last_back_idx = disk.len() - 1;
     while idx < disk.len() {
-        // Skip until we have free space
-        idx += disk[idx..].iter().take_while(|d| d.is_some()).count();
-        println!("outer idx: {idx}");
-        let mut back_idx = last_back_idx;
-        'inner_fill: loop {
-            let num_free = &disk[idx..].iter().take_while(|d| d.is_none()).count();
-
-            // Search for first disk from the back
-            while disk[back_idx].is_none() {
-                back_idx -= 1;
-                if back_idx <= idx {
-                    println!("Advancing idx");
-                    let idx = disk[idx..].iter().take_while(|d| d.is_none()).count();
-                    if idx >= disk.len() {
-                        break;
-                    }
-                }
-            }
-
-            let id = &disk[back_idx];
-            let mut start_idx = back_idx - 1;
-            while id == &disk[start_idx - 1] {
-                start_idx -= 1;
-            }
-            println!("Found {id:?} at {start_idx} -> {back_idx}");
-            let num_needed = back_idx - start_idx + 1;
-            if num_needed < *num_free {
-                last_back_idx = start_idx;
-                println!("Swapping {start_idx} -> {idx}: {num_needed}");
-                for _ in 0..num_needed {
-                    disk.swap(idx, start_idx);
-                    idx += 1;
-                    start_idx += 1;
-                }
-                break 'inner_fill;
-            }
-
-            back_idx = start_idx - 1;
+        idx += disk.iter().skip(idx).take_while(|p| p.is_some()).count();
+        let free = disk.iter().skip(idx).take_while(|p| p.is_none()).count();
+        //println!("Found free: {free}");
+        if needed <= free {
+            return Some(idx);
         }
+        idx += free;
+    }
+    None
+}
+
+fn compact_2(mut disk: Disk) -> Disk {
+    let mut back_idx = disk.len() - 1;
+
+    while back_idx > 0 {
+        while back_idx > 0 && disk[back_idx].is_none() {
+            back_idx -= 1;
+        }
+        let Some(id) = disk[back_idx] else {
+            unreachable!();
+        };
+        let mut start_idx = back_idx - 1;
+        while Some(id) == disk[start_idx] && start_idx > 0 {
+            start_idx -= 1;
+        }
+        // Last we found was bad
+        start_idx += 1;
+
+        let l = back_idx - start_idx + 1;
+        //println!("Looking for {id}: {l}");
+        if let Some(idx) = find_free_space(&disk[..start_idx], l) {
+            //println!("moving {id} -> {idx}");
+            for i in 0..l {
+                disk.swap(idx + i, start_idx + i);
+            }
+        }
+        back_idx = start_idx-1;
     }
     disk
 }
@@ -166,7 +163,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn day9_run_2() {
         assert_eq!(super::run_2(INPUT_1).unwrap(), 2858);
     }
