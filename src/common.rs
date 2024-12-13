@@ -26,6 +26,23 @@ impl std::ops::Mul<Coord> for usize {
     }
 }
 
+impl std::ops::Mul<Coord> for isize {
+    type Output = Coord;
+
+    fn mul(self, rhs: Coord) -> Self::Output {
+        Coord(rhs.0 * self, rhs.1 * self)
+    }
+}
+
+impl std::ops::Mul<Coord> for i32 {
+    type Output = Coord;
+
+    fn mul(self, rhs: Coord) -> Self::Output {
+        let i = self as isize;
+        Coord(rhs.0 * i, rhs.1 * i)
+    }
+}
+
 impl std::fmt::Display for Coord {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "({}, {})", self.0, self.1)
@@ -51,6 +68,11 @@ impl Coord {
     pub fn icol(&self) -> isize {
         self.1
     }
+
+    pub fn is_positive(&self) -> bool {
+        self.0 >= 0 && self.1 >= 0
+    }
+
     pub fn neighbors(&self) -> impl Iterator<Item = Self> {
         [
             (self.irow() - 1, self.icol()).into(),
@@ -80,6 +102,12 @@ impl From<(isize, isize)> for Coord {
 
 impl From<(i32, i32)> for Coord {
     fn from(value: (i32, i32)) -> Self {
+        Self(value.0 as _, value.1 as _)
+    }
+}
+
+impl From<(u64, u64)> for Coord {
+    fn from(value: (u64, u64)) -> Self {
         Self(value.0 as _, value.1 as _)
     }
 }

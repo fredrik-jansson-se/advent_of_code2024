@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1"
+nalgebra = { version = "0.33.2", features = ["macros"] }
 nom = "7"
 pathfinding = "4.11.0"
 rayon = "1.10.0"
