@@ -1,4 +1,4 @@
-#[derive(Clone, Copy, Debug, Default, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Coord(pub isize, pub isize);
 
 impl std::ops::Add<Coord> for Coord {
@@ -121,14 +121,14 @@ pub(crate) enum Dir {
 }
 
 impl Dir {
-    //pub(crate) fn turn_left(self) -> Self {
-    //    match self {
-    //        Dir::N => Self::W,
-    //        Dir::S => Self::E,
-    //        Dir::E => Self::N,
-    //        Dir::W => Self::S,
-    //    }
-    //}
+    pub(crate) fn turn_left(self) -> Self {
+        match self {
+            Dir::N => Self::W,
+            Dir::S => Self::E,
+            Dir::E => Self::N,
+            Dir::W => Self::S,
+        }
+    }
 
     pub(crate) fn turn_right(self) -> Self {
         match self {
@@ -168,19 +168,19 @@ impl Pos {
         }
     }
 
-    //pub fn turn_right(&self) -> Self {
-    //    Self {
-    //        coord: self.coord,
-    //        dir: self.dir.turn_right(),
-    //    }
-    //}
+    pub fn turn_right(&self) -> Self {
+        Self {
+            coord: self.coord,
+            dir: self.dir.turn_right(),
+        }
+    }
 
-    //pub fn turn_left(&self) -> Self {
-    //    Self {
-    //        coord: self.coord,
-    //        dir: self.dir.turn_left(),
-    //    }
-    //}
+    pub fn turn_left(&self) -> Self {
+        Self {
+            coord: self.coord,
+            dir: self.dir.turn_left(),
+        }
+    }
     //
     //pub fn row(&self) -> usize {
     //    self.coord.row()
