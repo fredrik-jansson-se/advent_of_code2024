@@ -1,3 +1,5 @@
+use std::isize;
+
 #[derive(Clone, Copy, Debug, Default, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Coord(pub isize, pub isize);
 
@@ -74,11 +76,15 @@ impl Coord {
     }
 
     pub fn neighbors(&self) -> impl Iterator<Item = Self> {
+        self.neighbors_with_step(1)
+    }
+
+    pub fn neighbors_with_step(&self, step: isize) -> impl Iterator<Item = Self> {
         [
-            (self.irow() - 1, self.icol()).into(),
-            (self.irow() + 1, self.icol()).into(),
-            (self.irow(), self.icol() - 1).into(),
-            (self.irow(), self.icol() + 1).into(),
+            (self.irow() - step, self.icol()).into(),
+            (self.irow() + step, self.icol()).into(),
+            (self.irow(), self.icol() - step).into(),
+            (self.irow(), self.icol() + step).into(),
         ]
         .into_iter()
     }

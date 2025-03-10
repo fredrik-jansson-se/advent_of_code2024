@@ -105,8 +105,6 @@ fn execute(program: Program) -> anyhow::Result<Vec<i64>> {
     let main_fn_type = ctx.void_type().fn_type(&[], false);
     let main_fn = module.add_function("tmp", main_fn_type, None);
 
-    //let entry
-
     let main_entry = ctx.append_basic_block(main_fn, "entry");
 
     builder.position_at_end(main_entry);
@@ -200,7 +198,7 @@ fn execute(program: Program) -> anyhow::Result<Vec<i64>> {
             // out
             5 => {
                 let arg = read_operand(&ctx, &builder, &ptrs, operand)?;
-                builder.build_call(append_fn, &[arg.into()], "call output")?;
+                builder.build_call(append_fn, &[arg.into()], "append")?;
                 builder.build_unconditional_branch(blocks[&(pc + 2)])?;
             }
             6 => {
@@ -322,7 +320,7 @@ fn run_2(input: &str) -> anyhow::Result<usize> {
         .build_call(
             init_a_fn,
             &[ctx.i64_type().const_zero().into()],
-            "call output",
+            "init_a",
         )?
         .try_as_basic_value()
         .left()
@@ -420,7 +418,7 @@ fn run_2(input: &str) -> anyhow::Result<usize> {
                 let arg =
                     builder.build_int_signed_rem(arg, ctx.i64_type().const_int(8, false), "mod")?;
                 let res = builder
-                    .build_call(append_fn, &[arg.into()], "call output")?
+                    .build_call(append_fn, &[arg.into()], "append")?
                     .try_as_basic_value()
                     .left()
                     .unwrap();
@@ -467,7 +465,7 @@ fn run_2(input: &str) -> anyhow::Result<usize> {
     builder.position_at_end(end_entry);
     builder.build_return(None)?;
 
-    println!("{}", module.to_string());
+    //println!("{}", module.to_string());
     if !main_fn.verify(true) {
         return Err(anyhow::anyhow!("bad function"));
     }
