@@ -51,7 +51,7 @@ fn parse(i: Input) -> PResult<Program> {
     Ok((i, Program { a, b, c, program }))
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn append(c: i64) -> i64 {
     let c = c % 8;
     OUT.with_borrow_mut(|rc| rc.push(c));
@@ -269,13 +269,13 @@ fn run_1(input: &str) -> anyhow::Result<String> {
         .join(","))
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn init_a(_c: i64) -> i64 {
     let mut a = 0;
     INIT_A.with_borrow(|v| a = *v);
     a
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn append2(c: i64) -> i64 {
     let eq = OUT2.with_borrow_mut(|o2| {
         let l = o2.len();
