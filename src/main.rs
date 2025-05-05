@@ -1,7 +1,8 @@
 use std::env;
 
 pub type Input<'a> = &'a str;
-pub type PResult<'a, T> = nom::IResult<Input<'a>, T, nom::error::VerboseError<Input<'a>>>;
+// pub type PResult<'a, T> = nom::IResult<Input<'a>, T, nom::error::VerboseError<Input<'a>>>;
+pub type PResult<'a, T> = nom::IResult<Input<'a>, T>;
 
 mod common;
 mod day1;

@@ -1,4 +1,5 @@
 use anyhow::anyhow;
+use nom::Parser;
 use rayon::prelude::*;
 
 use crate::{common::Coord, Input, PResult};
@@ -48,7 +49,7 @@ fn parse_game(i: Input) -> PResult<Game> {
 }
 
 fn parse(i: Input) -> PResult<Vec<Game>> {
-    nom::multi::separated_list1(nom::character::complete::newline, parse_game)(i)
+    nom::multi::separated_list1(nom::character::complete::newline, parse_game).parse(i)
 }
 
 fn run_1(input: &str) -> anyhow::Result<usize> {

@@ -1,4 +1,5 @@
 use anyhow::anyhow;
+use nom::Parser;
 use rayon::prelude::*;
 
 use crate::{common::Coord, Input, PResult};
@@ -40,7 +41,7 @@ fn parse_robot(i: Input) -> PResult<Robot> {
 }
 
 fn parse(i: Input) -> PResult<Vec<Robot>> {
-    nom::multi::separated_list1(nom::character::complete::newline, parse_robot)(i)
+    nom::multi::separated_list1(nom::character::complete::newline, parse_robot).parse(i)
 }
 
 fn run_1(input: &str, width: isize, height: isize) -> anyhow::Result<usize> {

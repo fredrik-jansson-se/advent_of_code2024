@@ -1,4 +1,5 @@
 use anyhow::anyhow;
+use nom::Parser;
 
 use crate::{Input, PResult};
 
@@ -20,18 +21,18 @@ pub fn run() -> anyhow::Result<()> {
 
 fn parse(i: Input) -> PResult<PageInput> {
     let (i, orders) =
-        nom::multi::separated_list1(nom::character::complete::newline, parse_pair)(i)?;
+        nom::multi::separated_list1(nom::character::complete::newline, parse_pair).parse(i)?;
 
-    let (i, _) = nom::multi::many1(nom::character::complete::newline)(i)?;
+    let (i, _) = nom::multi::many1(nom::character::complete::newline).parse(i)?;
     let (i, updates) =
-        nom::multi::separated_list1(nom::character::complete::newline, parse_updates)(i)?;
+        nom::multi::separated_list1(nom::character::complete::newline, parse_updates).parse(i)?;
     Ok((i, PageInput { orders, updates }))
 }
 
 fn parse_pair(i: Input) -> PResult<(usize, usize)> {
-    let (i, v1) = nom::combinator::map(nom::character::complete::u64, |v| v as usize)(i)?;
+    let (i, v1) = nom::combinator::map(nom::character::complete::u64, |v| v as usize).parse(i)?;
     let (i, _) = nom::bytes::complete::tag("|")(i)?;
-    let (i, v2) = nom::combinator::map(nom::character::complete::u64, |v| v as usize)(i)?;
+    let (i, v2) = nom::combinator::map(nom::character::complete::u64, |v| v as usize).parse(i)?;
 
     Ok((i, (v1, v2)))
 }
@@ -40,7 +41,7 @@ fn parse_updates(i: Input) -> PResult<Updates> {
     nom::multi::separated_list1(
         nom::bytes::complete::tag(","),
         nom::combinator::map(nom::character::complete::u64, |v| v as usize),
-    )(i)
+    ).parse(i)
 }
 
 fn run_1(input: &str) -> anyhow::Result<usize> {

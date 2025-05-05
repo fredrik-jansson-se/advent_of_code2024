@@ -1,4 +1,5 @@
 use anyhow::anyhow;
+use nom::Parser;
 use rayon::prelude::*;
 
 use crate::{Input, PResult};
@@ -86,12 +87,12 @@ fn parse_problem(i: Input) -> PResult<Problem> {
     let (i, terms) = nom::multi::separated_list1(
         nom::character::complete::space1,
         nom::character::complete::u64,
-    )(i)?;
+    ).parse(i)?;
     Ok((i, Problem { ans, terms }))
 }
 
 fn parse(i: Input) -> PResult<Vec<Problem>> {
-    nom::multi::separated_list1(nom::character::complete::newline, parse_problem)(i)
+    nom::multi::separated_list1(nom::character::complete::newline, parse_problem).parse(i)
 }
 
 #[cfg(test)]

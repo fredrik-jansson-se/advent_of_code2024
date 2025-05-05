@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use nom::{character::complete::newline, multi::separated_list1};
+use nom::{character::complete::newline, multi::separated_list1, Parser};
 
 use crate::{Input, PResult};
 
@@ -19,7 +19,7 @@ fn parse(i: Input) -> PResult<Vec<Report>> {
         nom::character::complete::space1,
         nom::character::complete::i64,
     );
-    separated_list1(newline, report)(i)
+    separated_list1(newline, report).parse(i)
 }
 
 fn run_1(input: &str) -> anyhow::Result<usize> {

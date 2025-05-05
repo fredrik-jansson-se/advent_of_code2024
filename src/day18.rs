@@ -1,4 +1,5 @@
 use anyhow::anyhow;
+use nom::Parser;
 
 use crate::{common::Coord, Input, PResult};
 
@@ -20,7 +21,7 @@ fn parse(i: Input) -> PResult<Vec<Coord>> {
         ),
         |(x, y)| Coord(y as _, x as _),
     );
-    nom::multi::separated_list1(nom::character::complete::newline, c)(i)
+    nom::multi::separated_list1(nom::character::complete::newline, c).parse(i)
 }
 
 fn run_1(input: &str, len: usize, num_bytes: usize) -> anyhow::Result<usize> {

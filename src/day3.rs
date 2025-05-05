@@ -1,4 +1,4 @@
-use nom::bytes::complete::tag;
+use nom::{bytes::complete::tag, Parser};
 
 use crate::{Input, PResult};
 
@@ -53,7 +53,7 @@ fn parse_2(i: &str, acc: &mut Vec<Op>) {
     if i.is_empty() {
         return;
     }
-    if let Ok((new_i, op)) = nom::branch::alt((parse_mul_1, parse_dont, parse_do))(i) {
+    if let Ok((new_i, op)) = nom::branch::alt((parse_mul_1, parse_dont, parse_do)).parse(i) {
         acc.push(op);
         parse_2(new_i, acc)
     } else {

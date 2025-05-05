@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use anyhow::anyhow;
-use nom::{character::complete::newline, sequence::separated_pair};
+use nom::{character::complete::newline, sequence::separated_pair, Parser};
 
 use crate::PResult;
 
@@ -50,7 +50,7 @@ fn parse(i: crate::Input) -> PResult<Vec<(i64, i64)>> {
         nom::character::complete::i64,
     );
 
-    nom::multi::separated_list1(newline, row)(i)
+    nom::multi::separated_list1(newline, row).parse(i)
 }
 
 #[cfg(test)]

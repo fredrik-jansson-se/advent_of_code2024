@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use anyhow::anyhow;
+use nom::Parser;
 use rayon::prelude::*;
 
 use crate::{Input, PResult};
@@ -40,7 +41,7 @@ fn parse(i: Input) -> PResult<Vec<u64>> {
     nom::multi::separated_list1(
         nom::character::complete::space1,
         nom::character::complete::u64,
-    )(i)
+    ).parse(i)
 }
 
 fn expand(v: u64, depth: usize, max_depth: usize) -> usize {

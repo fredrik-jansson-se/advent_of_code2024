@@ -5,6 +5,7 @@ use inkwell::{
     targets::{InitializationConfig, Target, TargetMachine},
     OptimizationLevel,
 };
+use nom::Parser;
 
 use crate::{Input, PResult};
 
@@ -47,7 +48,7 @@ fn parse(i: Input) -> PResult<Program> {
     let (i, _) = newline(i)?;
     let (i, _) = newline(i)?;
     let (i, _) = tag("Program: ")(i)?;
-    let (i, program) = nom::multi::separated_list1(tag(","), nom::character::complete::u8)(i)?;
+    let (i, program) = nom::multi::separated_list1(tag(","), nom::character::complete::u8).parse(i)?;
     Ok((i, Program { a, b, c, program }))
 }
 

@@ -1,3 +1,5 @@
+use nom::Parser;
+
 use crate::{
     common::{Coord, Dir},
     Input, PResult,
@@ -41,7 +43,7 @@ fn parse_map(i: Input) -> PResult<Map> {
 
     let row = nom::multi::many1(nom::branch::alt((wall, r#box, robot, empty)));
 
-    nom::multi::separated_list1(nom::character::complete::newline, row)(i)
+    nom::multi::separated_list1(nom::character::complete::newline, row).parse(i)
 }
 
 fn parse(i: Input) -> PResult<(Map, Moves)> {
@@ -70,7 +72,7 @@ fn parse(i: Input) -> PResult<(Map, Moves)> {
         |_| Dir::E,
     );
 
-    let (i, moves) = nom::multi::many1(nom::branch::alt((up, left, down, right)))(i)?;
+    let (i, moves) = nom::multi::many1(nom::branch::alt((up, left, down, right))).parse(i)?;
 
     Ok((i, (the_map, moves)))
 }
