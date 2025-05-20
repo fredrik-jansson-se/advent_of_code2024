@@ -34,16 +34,39 @@ fn build_graph(
 fn run_1(input: &str) -> anyhow::Result<usize> {
     let (nodes, graph) = build_graph(input);
 
-    let mut cnt = 0;
+    let g = petgraph::dot::Dot::with_config(&graph, &[petgraph::dot::Config::EdgeNoLabel]);
+    let _ = std::fs::write("g.dot", g.to_string().as_bytes());
+
+    // let scc = petgraph::algo::tarjan_scc(&graph);
+    // dbg!{&scc};
+
+    let mut s = std::collections::HashSet::new();
     for n in nodes.keys().filter(|n| n.starts_with("t")) {
-        let e = graph.edges(nodes[n]).count();
-        println!("{n}: {e}");
-        for _e in graph.edges(nodes[n]) {
-            //dbg!{e};
-            cnt += 1;
+        let nbrs: Vec<_> = graph.neighbors(nodes[n]).collect();
+        let mut trios = vec![nodes[n], nodes[n], nodes[n]];
+        for nbr in nbrs.chunks(2) {
+            trios[1] = nbr[0];
+            trios[2] = nbr[1];
+            trios.sort();
+            s.insert(trios.clone());
+            print!("{n} -> ");
+            print!(
+                "{} -> ",
+                nodes
+                    .iter()
+                    .find_map(|(k, v)| if *v == nbr[0] { Some(k) } else { None })
+                    .unwrap()
+            );
+            println!(
+                "{}",
+                nodes
+                    .iter()
+                    .find_map(|(k, v)| if *v == nbr[1] { Some(k) } else { None })
+                    .unwrap()
+            );
         }
     }
-    Ok(cnt)
+    Ok(s.len())
 }
 
 fn run_2(_input: &str) -> anyhow::Result<usize> {

@@ -31,7 +31,8 @@ fn parse_map(i: &str) -> Map {
                 'E' => {
                     map.end = (r, c).into();
                 }
-                _ => (),
+                '.' => (),
+                _ => unreachable!(),
             }
         }
     }
@@ -39,7 +40,7 @@ fn parse_map(i: &str) -> Map {
     map
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct State {
     can_cheat: bool,
     pos: Coord,
@@ -59,14 +60,14 @@ impl std::hash::Hash for State {
 
 impl std::cmp::Eq for State {}
 
-fn find_all_routes(map: &Map) -> Vec<Vec<Coord>> {
+fn find_all_routes(map: &Map, min_save: usize) -> usize {
     // start without cheat to find the non cheating path
     let start_state = State {
         can_cheat: false,
         pos: map.start,
     };
 
-    let (res, _) = pathfinding::directed::astar::astar(
+    let (res, non_cheat_len) = pathfinding::directed::astar::astar(
         &start_state,
         |s| {
             s.pos
@@ -87,7 +88,8 @@ fn find_all_routes(map: &Map) -> Vec<Vec<Coord>> {
     )
     .expect("Failed to find path");
 
-    println!("Len: {}", res.len());
+    // let non_cheat_len = res.len();
+    println!("Non cheat len: {non_cheat_len}");
 
     // Now allow cheats
     let start_state = State {
@@ -95,46 +97,60 @@ fn find_all_routes(map: &Map) -> Vec<Vec<Coord>> {
         pos: map.start,
     };
 
-    let (res, _) = pathfinding::directed::astar::astar_bag_collect(
-        &start_state,
-        |s| {
-            let pos = s.pos;
-            let can_cheat = s.can_cheat;
-            let cheat_nbrs: Vec<(State, usize)> = if can_cheat {
-                pos.neighbors_with_step(2)
-                    .filter(|p| !map.walls.contains(p))
-                    .map(|n| {
-                        (
-                            State {
-                                can_cheat: false,
-                                pos: n,
-                            },
-                            1usize,
-                        )
-                    })
-                    .collect()
-            } else {
-                Vec::new()
-            };
-            let cheat_nbrs = cheat_nbrs.into_iter();
-            pos.neighbors()
-                .filter(|n| !map.walls.contains(n))
-                .map(move |n| (State { can_cheat, pos: n }, 1usize))
-                .chain(cheat_nbrs)
-        },
-        |s| s.pos.manhattan(&map.end),
-        |s| s.pos == map.end,
-    )
-    .expect("Failed to find path");
+    let mut lookup: std::collections::HashMap<usize, usize> = Default::default();
+    for can_cheat_at in res.iter().map(|s| s.pos) {
+        if let Some((_path, len)) = pathfinding::directed::astar::astar(
+            &start_state,
+            |s| {
+                let can_cheat = s.can_cheat;
+                let cheat_nbrs: Vec<(State, usize)> = if can_cheat && s.pos == can_cheat_at {
+                    s.pos
+                        .neighbors_with_step(2)
+                        .filter(|p| !map.walls.contains(p))
+                        .map(|n| {
+                            (
+                                State {
+                                    can_cheat: false,
+                                    pos: n,
+                                },
+                                2usize,
+                            )
+                        })
+                        .collect()
+                } else {
+                    Vec::new()
+                };
+                let cheat_nbrs = cheat_nbrs.into_iter();
+                s.pos
+                    .neighbors()
+                    .filter(|n| !map.walls.contains(n))
+                    .map(move |n| (State { can_cheat, pos: n }, 1usize))
+                    .chain(cheat_nbrs)
+            },
+            |s| s.pos.manhattan(&map.end),
+            |s| s.pos == map.end,
+        ) {
+            if len < non_cheat_len {
+                let d = non_cheat_len - len;
+                if d >= min_save {
+                    *lookup.entry(d).or_default() += 1;
+                    println!("{len} -> {}", non_cheat_len - len);
+                }
+            }
+        }
+    }
+    dbg! {&lookup};
+    // for r in results.iter().filter(|r| r.len() < non_cheat_len) {
+    //     println!("d: {}", non_cheat_len - r.len());
+    // }
 
-    dbg! {&res.len()};
-    todo!()
+    lookup.values().sum()
 }
 
 fn run_1(input: &str, _least_save: usize) -> anyhow::Result<usize> {
     let map = parse_map(input);
-    let _posibilities = find_all_routes(&map);
-    Ok(0)
+    let res = find_all_routes(&map, 100);
+    Ok(res)
 }
 
 fn run_2(_input: &str) -> anyhow::Result<usize> {

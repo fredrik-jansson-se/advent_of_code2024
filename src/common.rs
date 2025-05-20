@@ -50,9 +50,9 @@ impl std::fmt::Display for Coord {
 }
 
 impl Coord {
-    //pub fn new(row: isize, col: isize) -> Self {
-    //    (row, col).into()
-    //}
+    pub fn new(row: isize, col: isize) -> Self {
+       (row, col).into()
+    }
     pub fn row(&self) -> usize {
         self.0 as _
     }
@@ -185,12 +185,21 @@ impl Pos {
             dir: self.dir.turn_left(),
         }
     }
-    //
-    //pub fn row(&self) -> usize {
-    //    self.coord.row()
-    //}
-    //
-    //pub fn col(&self) -> usize {
-    //    self.coord.col()
-    //}
+}
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn common_n_movement() {
+        let c: super::Coord = (0, 0).into();
+        let nbrs: std::collections::HashSet<super::Coord> =
+            [(0, 2).into(), (0, -2).into(), (2, 0).into(), (-2, 0).into()]
+                .into_iter()
+                .collect();
+        assert_eq!(
+            c.neighbors_with_step(2)
+                .collect::<std::collections::HashSet<_>>(),
+            nbrs
+        );
+    }
 }
